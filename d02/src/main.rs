@@ -30,6 +30,33 @@ pub fn inner_solve<S: AsRef<str>>(s: S) -> u32 {
     reports.iter().filter(|r| is_safe(r)).count() as u32
 }
 
+pub fn inner_solve2<S: AsRef<str>>(s: S) -> u32 {
+    let reports = gen_reports(s.as_ref());
+
+    let mut c: u32 = 0;
+    for r in reports.iter() {
+        // generate all permutations of the report
+        'inner: for elem in 0..r.len() {
+            let mut perm: Vec<u32> = vec![];
+            for inner_elem in 0..r.len() {
+                if inner_elem != elem {
+                    perm.push(r[inner_elem])
+                }
+            }
+            println!("{:?}", perm);
+            if is_safe(&perm) {
+                c += 1;
+                break 'inner;
+            }
+        }
+
+        println!("{:?}", r);
+    }
+
+    c
+    // reports.iter().filter(|r| is_safe(r)).count() as u32
+}
+
 // Must be:
 // 1. Either strictly increasing or strictly decreasing
 // 2. Each adjacent pair must have a difference of at least 1, at most 3
@@ -57,46 +84,6 @@ fn is_safe(r: &[u32]) -> bool {
             return false;
         }
         prev = *curr;
-    }
-    true
-}
-
-pub fn inner_solve2<S: AsRef<str>>(s: S) -> u32 {
-    let reports = gen_reports(s.as_ref());
-
-    // let mut right_freq: HashMap<u32, u32> = HashMap::new();
-    // for r in right.iter() {
-    //     let count = right_freq.entry(*r).or_insert(0);
-    //     *count += 1;
-    // }
-    //
-    // let mut total: u32 = 0;
-    // for l in left.iter() {
-    //     let sim = right_freq.get(l).unwrap_or(&0);
-    //     total += *sim * l;
-    // }
-
-    0
-}
-
-fn is_increasing(v: &Vec<u32>) -> bool {
-    let mut prev = v[0];
-    for n in v.iter().skip(1) {
-        if *n < prev {
-            return false;
-        }
-        prev = *n;
-    }
-    true
-}
-
-fn is_decreasing(v: &Vec<u32>) -> bool {
-    let mut prev = v[0];
-    for n in v.iter().skip(1) {
-        if *n > prev {
-            return false;
-        }
-        prev = *n;
     }
     true
 }
@@ -138,6 +125,6 @@ mod test {
     #[test]
     fn result2() {
         let result = inner_solve2(INPUT);
-        assert_eq!(31, result);
+        assert_eq!(4, result);
     }
 }
