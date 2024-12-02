@@ -1,1 +1,4 @@
 /target
+
+# ignore input b/c git-crypt still sucks
+input
