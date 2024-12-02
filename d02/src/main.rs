@@ -28,6 +28,26 @@ pub fn gen_reports<S: AsRef<str>>(s: S) -> Vec<Vec<u32>> {
 pub fn inner_solve<S: AsRef<str>>(s: S) -> u32 {
     let reports = gen_reports(s.as_ref());
 
+    let deltas = reports.iter().map(|r| {
+        let mut prev = r[0];
+        let mut d: Vec<u32> = vec![];
+        for n in r.iter().skip(1) {
+            let diff = if n > &prev { n - prev } else { prev - n };
+            d.push(diff);
+            prev = *n;
+        }
+        d
+    });
+
+    // .map(|r| {
+    //     let mut r = r.clone();
+    //     r.sort_unstable();
+    //     let min = r[0];
+    //     let max = r[r.len() - 1];
+    //     max - min
+    // })
+    // .collect::<Vec<u32>>();
+
     // left.sort_unstable();
     // right.sort_unstable();
     //
@@ -56,6 +76,28 @@ pub fn inner_solve2<S: AsRef<str>>(s: S) -> u32 {
     // }
 
     0
+}
+
+fn is_increasing(v: &Vec<u32>) -> bool {
+    let mut prev = v[0];
+    for n in v.iter().skip(1) {
+        if *n < prev {
+            return false;
+        }
+        prev = *n;
+    }
+    true
+}
+
+fn is_decreasing(v: &Vec<u32>) -> bool {
+    let mut prev = v[0];
+    for n in v.iter().skip(1) {
+        if *n > prev {
+            return false;
+        }
+        prev = *n;
+    }
+    true
 }
 
 #[cfg(test)]
@@ -89,7 +131,7 @@ mod test {
     #[test]
     fn result1() {
         let result = inner_solve(INPUT);
-        assert_eq!(11, result);
+        assert_eq!(2, result);
     }
 
     #[test]
