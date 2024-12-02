@@ -27,37 +27,38 @@ pub fn gen_reports<S: AsRef<str>>(s: S) -> Vec<Vec<u32>> {
 
 pub fn inner_solve<S: AsRef<str>>(s: S) -> u32 {
     let reports = gen_reports(s.as_ref());
+    reports.iter().filter(|r| is_safe(r)).count() as u32
+}
 
-    let deltas = reports.iter().map(|r| {
-        let mut prev = r[0];
-        let mut d: Vec<u32> = vec![];
-        for n in r.iter().skip(1) {
-            let diff = if n > &prev { n - prev } else { prev - n };
-            d.push(diff);
-            prev = *n;
+// Must be:
+// 1. Either strictly increasing or strictly decreasing
+// 2. Each adjacent pair must have a difference of at least 1, at most 3
+fn is_safe(r: &[u32]) -> bool {
+    let mut prev = r[0];
+    let (mut increasing, mut decreasing) = (true, true);
+    for curr in r.iter().skip(1) {
+        let diff = if curr > &prev {
+            curr - prev
+        } else {
+            prev - curr
+        };
+        // short-circuit if non-gradual increase/decrease
+        if diff < 1 || diff > 3 {
+            return false;
         }
-        d
-    });
 
-    // .map(|r| {
-    //     let mut r = r.clone();
-    //     r.sort_unstable();
-    //     let min = r[0];
-    //     let max = r[r.len() - 1];
-    //     max - min
-    // })
-    // .collect::<Vec<u32>>();
+        if *curr > prev {
+            decreasing = false;
+        } else if *curr < prev {
+            increasing = false;
+        }
 
-    // left.sort_unstable();
-    // right.sort_unstable();
-    //
-    // let mut sum_differences: u32 = 0;
-    // for (a, b) in left.iter().zip(right.iter()) {
-    //     let diff = if a > b { a - b } else { b - a };
-    //     sum_differences += diff;
-    // }
-
-    0
+        if !increasing && !decreasing {
+            return false;
+        }
+        prev = *curr;
+    }
+    true
 }
 
 pub fn inner_solve2<S: AsRef<str>>(s: S) -> u32 {
